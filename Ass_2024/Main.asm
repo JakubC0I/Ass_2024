@@ -21,7 +21,7 @@ includelib \masm32\lib\masm32.lib
 ; Stufe 2 - make sure that only numbers are entered
 macros:
 	check_if_number macro value
-	LOCAL stufe_zwei, is_a_number
+	LOCAL stufe_zwei, is_a_number, skip
 
 		cmp value, 0
 		je goodbye
@@ -29,15 +29,20 @@ macros:
 		cmp value, 48
 		jge stufe_zwei
 
-		jmp nan_error
+		jmp skip
 
 		stufe_zwei:
 			cmp value, 57
 			jle is_a_number
 		
-		jmp nan_error
+	skip:
+		; if it is not a number push latest number saved in ECX as a first argument
+		push ecx
+		jmp add_and_read
 
 	is_a_number:
+		; if it is a number save it in ecx
+		mov ecx, value
 		exitm
 		endm
 
@@ -105,10 +110,11 @@ read_charecters:
 		check_if_number eax
 		push eax
 
+	add_and_read:
+
 		lodsb
 		check_if_number eax
 		push eax
-
 
 		push offset result
 		call exam_proc
@@ -118,11 +124,6 @@ goodbye:
 	; printf("Result: %s")
 	push offset result
 	call StdOut
-	exit
-
-nan_error:
-	printf("Es sind nur Ziffern bei der Eingabe zugelassen. Bitte erneut versuchen")
-	mov eax, 2
 	exit
 
 
