@@ -18,6 +18,29 @@ includelib \masm32\lib\masm32.lib
 	char_to_add db ?
 .code
 
+; Stufe 2 - make sure that only numbers are entered
+macros:
+	check_if_number macro value
+	LOCAL stufe_zwei, is_a_number
+
+		cmp value, 0
+		je goodbye
+
+		cmp value, 48
+		jge stufe_zwei
+
+		jmp nan_error
+
+		stufe_zwei:
+			cmp value, 57
+			jle is_a_number
+		
+		jmp nan_error
+
+	is_a_number:
+		exitm
+		endm
+
 exam_proc proc
 	push ebp
 	mov ebp, esp
@@ -79,17 +102,13 @@ read_charecters:
 		mov eax, 0
 	
 		lodsb
+		check_if_number eax
 		push eax
-
-		cmp eax, 0
-		je goodbye
 
 		lodsb
+		check_if_number eax
 		push eax
 
-		; Beacuse the case where first number is something and a second is 0 (end of a string)
-		cmp eax, 0
-		je goodbye
 
 		push offset result
 		call exam_proc
@@ -99,6 +118,11 @@ goodbye:
 	; printf("Result: %s")
 	push offset result
 	call StdOut
+	exit
+
+nan_error:
+	printf("Es sind nur Ziffern bei der Eingabe zugelassen. Bitte erneut versuchen")
+	mov eax, 2
 	exit
 
 
