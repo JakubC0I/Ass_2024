@@ -14,11 +14,9 @@ includelib \masm32\lib\masm32.lib
 	inputVar db 100 dup(?), 0
 	first dd ?
 	second dd ?
-	result dd ?
+	result db 100 dup(?), 0 ; change it into array of ints
+	char_to_add db ?
 .code
-
-
-
 
 exam_proc proc
 	push ebp
@@ -44,10 +42,13 @@ do_negation:
 	neg edx
 
 conti:
+	add edx, 30h
 	; get value (address) from a parameter
 	mov eax, [ebp + 8]
 	; insert into this address value of edx 
-	mov [eax], edx
+
+	mov [eax + ebx], edx
+	inc ebx
 
 	mov esp, ebp
 	pop ebp
@@ -66,26 +67,44 @@ greet_and_take:
 	call StdIn
 
 read_charecters:
-	mov eax, 0
+
 	lea si, inputVar ; Pass address of a string into si
 	; Load string address from si register and advance one character (saves in AL)
-	lodsb
-	push eax
+	
+	; increment to take 2 first values at the beginning
+	inc si
 
-	lodsb
-	push eax
+	read:
+		dec si
+		mov eax, 0
+	
+		lodsb
+		push eax
 
-	push offset result
-	call exam_proc
-	jmp goodbye
+		cmp eax, 0
+		je goodbye
+
+		lodsb
+		push eax
+
+		; Beacuse the case where first number is something and a second is 0 (end of a string)
+		cmp eax, 0
+		je goodbye
+
+		push offset result
+		call exam_proc
+		jmp read
 	
 goodbye:
-	printf("\nDistance between first and second number is: %d", result)
+	; printf("Result: %s")
+	push offset result
+	call StdOut
 	exit
 
 
 inout:
-	mov eax,0
+	mov eax, 0
+	mov ebx, 0
 	mov edx, 0
 	
 	jmp greet_and_take
