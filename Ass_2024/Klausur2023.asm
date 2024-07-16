@@ -21,6 +21,7 @@ includelib \masm32\lib\masm32.lib
 ; Stufe 2 - make sure that only numbers are entered
 macros:
 	check_if_number macro value
+	; required to declare which labels are local to a macro
 	LOCAL stufe_zwei, is_a_number, skip
 
 		cmp value, 0
@@ -62,6 +63,7 @@ exam_proc proc
 	sub edx, eax
 
 	cmp edx, 0
+	; jump if a number has a "Vorzeichen"
 	js do_negation
 	jmp conti
 
@@ -127,7 +129,7 @@ goodbye:
 	exit
 
 
-inout:
+klausur2023:
 	mov eax, 0
 	mov ebx, 0
 	mov edx, 0
@@ -135,4 +137,4 @@ inout:
 	jmp greet_and_take
 	jmp read_charecters
 
-end inout
+end klausur2023

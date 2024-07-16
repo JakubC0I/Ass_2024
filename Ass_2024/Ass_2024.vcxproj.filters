@@ -15,7 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="Main.asm">
+    <MASM Include="Klausur2023.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="Klausur2022.asm">
       <Filter>Source Files</Filter>
     </MASM>
   </ItemGroup>
