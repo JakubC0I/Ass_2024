@@ -1,0 +1,3 @@
+https://www.cs.virginia.edu/~evans/cs216/guides/x86.html
+
+https://www.i8086.de/asm/8086-88-asm.html
