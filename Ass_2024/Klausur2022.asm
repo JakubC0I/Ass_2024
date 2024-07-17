@@ -18,6 +18,8 @@ includelib \masm32\lib\masm32.lib
 	words dd ?
 	words_result dd ?
 	characters_result dd ?
+	string_end db "|E| |A|"
+	string_result_end db "|E|", 0
 
 .code
 
@@ -64,29 +66,64 @@ add_word_no_debug:
 
 ja_debug:
 	printf("Debugger mode activated\n")
+	lea di, inputVarDebug
+	add di, 3
+	xor ebx, ebx
 
 conti_debug:
+	xor al, al
+	mov al, [esi]
 	movsb
+	inc ebx
 
 	cmp al, ' ' ;compare to space to add it as a word
-	je add_word_no_debug
+	je add_word_debug
 
 	cmp al, 0 ;compare to end of a string
-	je return_results
+	je return_results_debug
 	
 	jmp conti_debug
 
 add_word_debug:
 	inc words
-	mov di, '|'
-	inc di
-	mov di, 'E'
-	inc di
-	mov di, '|'
-	inc di
-	mov di, ' '
+	push esi
+	dec di
+	lea si, string_end
+	movsb
+	movsb
+	movsb
+
+	movsb
+	movsb
+	movsb
+	movsb
+
+	pop esi
 
 	jmp conti_debug
+
+return_results_debug:
+	lea si, string_result_end
+	dec di
+	movsb
+	movsb
+	movsb
+	movsb
+
+	mov edx, [ebp + 8] ; #characters
+	dec ebx ; minus 0 at the end of a string
+	mov [edx], ebx
+
+	
+	
+	mov ecx, [words]
+	inc ecx ; add first word / number of spaces + 1
+	mov ebx, [ebp + 12] ;This is confusing why this has to be done this way
+	mov [ebx], ecx ; number of words	
+	
+	
+	pop ebp
+	ret 12 ; 4 x #input_params
 
 return_results:
 	sub esi, ebx
@@ -96,7 +133,7 @@ return_results:
 	; TODO make it use pop instead
 	mov ecx, [words]
 	inc ecx ; add first word / number of spaces + 1
-	mov ebx, [ebp + 12] ;
+	mov ebx, [ebp + 12] ;This is confusing why this has to be done this way
 	mov [ebx], ecx ; number of words
 
 	inc esi
@@ -145,9 +182,9 @@ after_greet:
 	jmp after_greet
 
 goodbye:
-	mov eax, words_result
-	mov ebx, characters_result
-	printf("Number of characters: %d\nNumber of words: %d", ebx, eax)
+	push offset inputVarDebug
+	call StdOut
+	printf("Number of characters: %d\nNumber of words: %d", characters_result, words_result)
 
 	xor eax, eax
 	exit
