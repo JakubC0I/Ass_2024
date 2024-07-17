@@ -81,7 +81,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <EntryPointSymbol>klausur2022</EntryPointSymbol>
+      <EntryPointSymbol>klausur2024</EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -131,6 +131,7 @@
   <ItemGroup>
     <MASM Include="Klausur2022.asm" />
     <MASM Include="Klausur2023.asm" />
+    <MASM Include="Klausur2024.asm" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
