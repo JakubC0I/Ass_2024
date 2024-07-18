@@ -19,10 +19,27 @@ includelib \masm32\lib\masm32.lib
 	char_to_add db ?
 .code
 
-; handle_debug proc 
+handle proc ;use parameters
+	push ebp
+	mov ebp, esp
 
+	lea si, inputVar
+	scan_string:
+		lodsb ; load first byte from an input string
 
-; handle_debug endp
+		cmp al, 0
+		je return_and_bye
+
+		printf("%c", al)
+
+		jmp scan_string
+
+	return_and_bye:
+		mov esp, ebp
+		pop ebp
+		ret 4 ; 4 x #input_params
+
+handle endp
 
 greet_and_take:
 	printf("Jakub Ciszak, 0112228\n")
@@ -49,7 +66,10 @@ after_greet:
 ;#####################GET 1 KEY
 	getkey() ; takes one key input and saves it in al
 	push eax
-	; call handle_debug
+	call handle
+	
+	cmp al, 0
+	je goodbye
 
 	jmp after_greet
 
