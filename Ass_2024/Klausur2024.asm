@@ -15,8 +15,9 @@ includelib \masm32\lib\masm32.lib
 	inputVar db 1000 dup(?), 0
 	debugger_msg db "debug modus anschalten? (j - ja / n - nein)",10, 0 ; 10 is a newline and 0 is string end
 	flag dd ?
-	result_year db ? ; as number
+	result_year dd ? ; as number
 	result_year_string db 4 dup(?), 0
+	result_year_int db 4 dup(?)
 	char_to_add db ?
 .code
 
@@ -43,6 +44,72 @@ is_a_number:
 goodbye_macro:
 	exitm
 	endm
+
+from_str_to_int_arr proc
+	push ebp
+	mov ebp, esp
+
+	mov ebx, [ebp + 8] ; source
+	lea si, [ebx]
+	mov ebx, [ebp + 12] ; destination
+	lea di, [edi]
+
+	swap:
+		lodsb
+
+		cmp al, 0
+		je done_result
+
+		sub al, 48
+		mov [edi], al
+		inc edi
+	jmp swap
+
+	done_result:
+		mov esp, ebp
+		pop ebp
+		ret 8 ; 4 x #input_params
+from_str_to_int_arr endp
+
+make_a_year proc
+	push ebp
+	mov ebp, esp
+	
+	mov ebx, [ebp + 8] ; source
+	lea si, [ebx]
+
+	mov ebx, [ebp + 12] ; destination
+	mov cx, 10
+
+	year:
+		lodsb
+		imul cx
+		imul cx
+		imul cx
+		add [ebx], eax
+		xor eax, eax
+		
+		lodsb
+		imul cx
+		imul cx
+		add [ebx], eax
+		xor eax, eax
+		
+		lodsb
+		imul cx
+		add [ebx], eax
+		xor eax, eax
+		
+		lodsb
+		add [ebx], eax
+
+		mov ebx, [ebx]
+
+	done_result:
+		mov esp, ebp
+		pop ebp
+		ret 8 ; 4 x #input_params
+make_a_year endp
 
 handle proc ;use parameters
 	push ebp
@@ -73,6 +140,7 @@ handle proc ;use parameters
 		check_if_number(eax)
 		cmp ecx, 0
 		je scan_string
+		dec esi
 		movsb
 
 	second_n:
@@ -80,6 +148,7 @@ handle proc ;use parameters
 		check_if_number(eax)
 		cmp ecx, 0
 		je scan_string
+		movsb
 
 	third_n:
 		mov al, [esi]
@@ -93,6 +162,7 @@ handle proc ;use parameters
 		check_if_number(eax)
 		cmp ecx, 0
 		je scan_string
+		movsb
 
 	fivth_not_a_number:
 		mov al, [esi]
@@ -128,19 +198,21 @@ after_greet:
 	push offset inputVar
 	push offset result_year
 	call handle
-	
-	cmp al, 0
-	je goodbye
-
-	jmp after_greet
 
 goodbye:
 	inc di
 	mov [edi], eax
+	push offset result_year_int ; destination [ebp + 12]
+	push offset result_year_string ; source [ebp + 8]
+	
+	call from_str_to_int_arr
 
-	push offset result_year_string
-	call StdOut
-	; printf("%s", result_year_string)
+	push offset result_year ; destination [ebp + 12]
+	push offset result_year_int ; source [ebp + 8]
+
+	call make_a_year
+
+	printf("Result is: %d", result_year)
 	exit
 
 
